@@ -102,8 +102,7 @@ function doInput()
 {
   var rawinputs = [];
   var link = document.createElement("a");
-  var url = location.pathname;
-  console.log(location);
+  var url = location.href;
 
   link.href = url;
   link.innerHTML = url;
@@ -120,7 +119,7 @@ function doInput()
       }
     }
     gstring = "?mode=cmplist&n="+n+gstring;
-    url = location.pathname+gstring;
+    url = location.href+gstring;
     link.href = url;
     link.innerHTML = url;
   }
@@ -134,10 +133,11 @@ function doInput()
     n = 0;
     twitterinput.value;
     gstring = "?mode=cmplist&n="+n+gstring;
-    url = location.pathname+gstring;
+    url = location.href+gstring;
     link.href = url;
     link.innerHTML = url;
   }
+  */
 
   body.appendChild(link);
 
