@@ -1,0 +1,210 @@
+<html>
+<head>
+<style>
+body
+{
+  padding:0px;
+  margin:0px;
+  position:0px, 0px;
+}
+img
+{
+  display:block;
+  padding:0px;
+  margin:0px;
+  position:0px, 0px;
+}
+div.index
+{
+  display:block;
+  padding:0px;
+  margin:0px;
+  position:0px, 0px;
+}
+div.description
+{
+  display:block;
+  margin:10px;
+}
+a
+{
+  display:block;
+  margin:10px;
+}
+input
+{
+  display:block;
+  margin:10px;
+}
+</style>
+</head>
+<body id="body">
+</body>
+<script type="text/javascript">
+function get(v)
+{
+  var params = location.search.substr(1).split("&");
+  for(var i = 0; i < params.length; i++)
+  {
+    var p = params[i].split("=");
+    if(p[0] === v) return decodeURIComponent(p[1]);
+  }
+  return null;
+}
+
+var body = document.getElementById("body");
+var img; //displayed image
+var curidisp; //displayed current index
+var imgs; //image loading containers
+var n; //number of images
+var curi = 0; //current display index
+var t; //time to advance (ms)
+var w; var wset = false;
+var h; var hset = false;
+var nloaded = 0;
+
+function advance()
+{
+  curi = (curi+1)%n;
+  img.src = imgs[curi].src;
+  curidisp.innerHTML = ""+curi;
+}
+
+function doCmp()
+{
+  curi = 0;
+  img.src = imgs[curi].src;
+  body.appendChild(img);
+  body.appendChild(curidisp);
+  if(t) setInterval(advance,t);
+}
+
+function imgload(i)
+{
+  if(i == 0)
+  {
+    var aspect = imgs[0].naturalWidth/imgs[0].naturalHeight;
+    if(!wset && !hset)
+    {
+      w = imgs[0].naturalWidth;
+      h = imgs[0].naturalHeight;
+    }
+    else if(!wset) w = aspect*h;
+    else if(!hset) h = w/aspect;
+    img.width  = w;
+    img.height = h;
+  }
+  nloaded++;
+  if(nloaded == n) doCmp();
+}
+
+function doInput()
+{
+  var rawinputs = [];
+  var link = document.createElement("a");
+  var url = location.pathname;
+  console.log(location);
+
+  link.href = url;
+  link.innerHTML = url;
+  function updateRawLink()
+  {
+    var gstring = "";
+    n = 0;
+    for(var i = 0; i < rawinputs.length; i++)
+    {
+      if(rawinputs[i].value)
+      {
+        gstring += "&img"+n+"="+encodeURIComponent(rawinputs[i].value);
+        n++;
+      }
+    }
+    gstring = "?mode=cmplist&n="+n+gstring;
+    url = location.pathname+gstring;
+    link.href = url;
+    link.innerHTML = url;
+  }
+  /*
+  //is there not a publicly documented open javascript twitter API somewhere?
+  //all I want is to take a link to a tweet, follow the reply chain up,
+  //and grab image links along the way...!
+  function updateTwitterLink()
+  {
+    var gstring = "";
+    n = 0;
+    twitterinput.value;
+    gstring = "?mode=cmplist&n="+n+gstring;
+    url = location.pathname+gstring;
+    link.href = url;
+    link.innerHTML = url;
+  }
+
+  body.appendChild(link);
+
+  var rawdesc = document.createElement("div");
+  rawdesc.className = "description";
+  rawdesc.innerHTML = "image links:"
+  body.appendChild(rawdesc);
+  for(var i = 0; i < 10; i++)
+  {
+    rawinputs[i] = document.createElement("input");
+    rawinputs[i].type = "text";
+    rawinputs[i].size = 20;
+    rawinputs[i].oninput = updateRawLink;
+    body.appendChild(rawinputs[i]);
+  }
+
+  /*
+  var twitterdesc = document.createElement("div");
+  twitterdesc.className = "description";
+  twitterdesc.innerHTML = "twitter link:"
+  body.appendChild(twitterdesc);
+  twitterinput = document.createElement("input");
+  twitterinput.type = "text";
+  twitterinput.size = 20;
+  twitterinput.oninput = updateTwitterLink;
+  body.appendChild(twitterinput);
+  */
+}
+
+function doCmpList()
+{
+  img = document.createElement("img");
+  curidisp = document.createElement("div");
+  curidisp.className = "index";
+  curidisp.innerHTML = "0";
+  img.onclick = advance;
+  n = parseInt(get("n"));
+  t = parseInt(get("t"));
+  if(parseInt(get("w"))) { w = parseInt(get("w")); wset = true; }
+  if(parseInt(get("h"))) { h = parseInt(get("h")); hset = true; }
+  imgs = [];
+  for(var i = 0; i < n; i++)
+  {
+    imgs[i] = document.createElement("img");
+    (function(i) { imgs[i].onload = function(){ imgload(i); }})(i);
+    imgs[i].src = get("img"+i);
+  }
+}
+
+function doCmpUrl()
+{
+}
+
+var mode = get("mode");
+switch(mode)
+{
+  case "cmplist":
+    doCmpList();
+    break;
+  case "cmpurl":
+    doCmpUrl();
+    break;
+  case null:
+  case "input":
+  default:
+    doInput();
+    break;
+}
+</script>
+</html>
